@@ -142,7 +142,7 @@ notEqual = CoreTest.notEqual = function notEqual(actual, expect, message) {
   @returns {Boolean} YES if passed
 */
 deepEqual = CoreTest.deepEqual = function deepEqual(actual, expect, msg) {
-  message = fmt('%@ should be deepEqual', message);
+  msg = fmt('%@ should be deepEqual', msg);
   return CoreTest.ok(CoreTest.equiv(actual, expect), msg, actual, expect);
 } ;
 same = deepEqual; // QUnit compatibility 

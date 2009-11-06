@@ -6,7 +6,7 @@
 // ==========================================================================
 /*globals run typeOf T_FUNCTION T_OBJECT T_HASH */
 
-"import tiki:core core";
+"import tiki:core tiki/system:core core";
 "export run";
 
 function _beginGroup(logger, moduleName) {
@@ -51,7 +51,7 @@ run = function run(tests, logger, moduleName) {
   var prevLogger, key, value, inGroup = false;
   
   prevLogger = CoreTest.logger;
-  logger = CoreTest.logger = (logger || require('system/logger', 'default').console);
+  logger = CoreTest.logger = (logger || require('system:package').console);
   
   for(key in tests) {
     if (!tests.hasOwnProperty(key)) continue;
