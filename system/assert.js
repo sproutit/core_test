@@ -97,6 +97,7 @@ ok = CoreTest.ok = function ok(pass, message, actual, expected) {
     
   } else {
     str = showVars ? '%@ (actual = %@, expected = %@)' : '%@';
+    debugger ;
     logger.error(fmt(str, message, actual, expected));
   }
   
