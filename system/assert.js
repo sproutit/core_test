@@ -8,7 +8,7 @@
 
 "import core utils system/dump";
 "export package AssertionError";
-"export package ok equal equals notEqual deepEqual same deepNotEqual";
+"export package ok equal equals notEqual deepEqual same deepNotEqual shouldThrow";
 
 /**
   @class
@@ -163,5 +163,32 @@ deepNotEqual = function deepNotEqual(actual, expect, msg) {
 } ;
 CoreTest.deepNotEqual = deepNotEqual;
 
+/**
+  Asserts that the passed callback will throw the an error with the expected
+  message.
+  
+  @param {Function} callback callback to execute
+  @param {String} expected string of message or false if no exception expected
+  @param {String} msg optional additonal message
+  @returns {Boolean} YES if passed
+*/
+shouldThrow = function shouldThrow(callback, expected, msg) {
+  var actual = false ;
+  
+  try {
+    callback();
+  } catch(e) {
+    actual = (typeof expected === "string") ? e.message : e;        
+  }
+  
+  if (expected===false) {
+    CoreTest.ok(actual===false, fmt("%@ expected no exception, actual %@", msg, actual));
+  } else if (expected===Error || expected===null || expected===true) {
+    CoreTest.ok(!!actual, fmt("%@ expected exception, actual %@", msg, actual));
+  } else {
+    equals(actual, expected, msg);
+  }
+};
+CoreTest.shouldThrow = shouldThrow;
 
 
