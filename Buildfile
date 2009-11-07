@@ -4,7 +4,7 @@
 # ===========================================================================
 
 config :core_test, 
-  :required       => [:tiki],
+  :required       => [:tiki, 'tiki/system'],
   :debug_required => [],
   :test_required  => [],
   :use_modules    => true,
