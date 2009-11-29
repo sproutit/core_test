@@ -67,17 +67,7 @@ Plan.prototype = {
     this._module = this._tests = this._setup = this._teardown = null; // reset
 
     var logger = this.logger;
-    if (logger) {
-      if (logger.planDidBegin) logger.planDidBegin(this);
-      else logger.info("Beginning plan: %@".fmt(this));
-    }
-
-    require('system/test').run(this, this.logger);
-    
-    if (logger) {
-      if (logger.planDidBegin) logger.planDidEnd(this);
-      else logger.info("Ending plan: %@".fmt(this));
-    }
+    require('system/test').run(this, logger);
     
     return this ;
   },
