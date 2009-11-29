@@ -145,7 +145,7 @@ BrowserLogger.prototype = {
   testDidEnd: function(testName) {
     var p = this._plan,  
         m = this._modules, 
-        t = this._test,
+        t = this._tests,
         a = this._assertions;
         
     m = m ? m[m.length-1] : '' ;
