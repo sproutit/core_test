@@ -5,7 +5,7 @@
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
 
-/*globals CoreTest module */
+/*globals CoreTest module utils */
 
 "import core system/plan";
 "import utils as utils";

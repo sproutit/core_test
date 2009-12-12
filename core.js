@@ -6,7 +6,7 @@
 // ==========================================================================
 /*globals CoreTest */
 
-"import utils";
+"import utils as utils";
 "export package CoreTest";
 
 /** @namespace
@@ -113,10 +113,10 @@ CoreTest = {
     if (!ret.expect) {
       ret.expect = function(callCount) {
         if (callCount === YES) {
-          ok(this.callCount > 0, CoreTest.fmt("%@ should be called at least once", this.stubName));
+          ok(this.callCount > 0, utils.fmt("%@ should be called at least once", this.stubName));
         } else {
           if (callCount === NO) callCount = 0;
-          equals(this.callCount, callCount, CoreTest.fmt("%@ should be called X times", this.stubName));
+          equals(this.callCount, callCount, utils.fmt("%@ should be called X times", this.stubName));
         }
       };
     }

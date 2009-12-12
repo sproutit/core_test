@@ -6,7 +6,7 @@
 // ==========================================================================
 /*globals CoreTest Plan plan module setup teardown test */
 
-"import core utils";
+"import core";
 "export package Plan test module plan setup teardown";
 
 /**

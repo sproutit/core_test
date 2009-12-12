@@ -4,24 +4,24 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals CoreTest BrowserLogger logger fmt */
+/*globals CoreTest BrowserLogger logger utils */
 
-"import core utils browser/jquery";
+"import core browser/jquery";
+"import utils as utils";
 "export package BrowserLogger";
 "export logger";
 
 /**
   The BrowserLogger can be used to log test output to the main web page.  
 */
-BrowserLogger = function BrowserLogger() {
-  this.stats = {
-    tests: 0, passed: 0, failed: 0, total: 0, errors: 0, warnings: 0
-  };
-  return this ;
-};
+BrowserLogger = utils.extend({
 
-BrowserLogger.prototype = {
-  constructor: BrowserLogger,
+  init: function() {
+    this.stats = {
+      tests: 0, passed: 0, failed: 0, total: 0, errors: 0, warnings: 0
+    };
+    return this ;
+  },
   
   testCount: 0,
   
@@ -80,25 +80,25 @@ BrowserLogger.prototype = {
     
     var result = this.report.find('.testresult .status');
     
-    var str = fmt('<span>Completed %@ tests in %@ msec. </span>'
+    var str = utils.fmt('<span>Completed %@ tests in %@ msec. </span>'
               +'<span class="total">%@</span> total assertions: ', r.tests, 
               r.runtime, r.total);
     
     if (r.passed > 0) {
-      str += fmt('&nbsp;<span class="passed">%@ passed</span>', r.passed);
+      str += utils.fmt('&nbsp;<span class="passed">%@ passed</span>', r.passed);
     }
     
     if (r.failed > 0) {
-      str += fmt('&nbsp;<span class="failed">%@ failed</span>', r.failed);
+      str += utils.fmt('&nbsp;<span class="failed">%@ failed</span>', r.failed);
     }
 
     if (r.errors > 0) {
-      str += fmt('&nbsp;<span class="errors">%@ error%@</span>', 
+      str += utils.fmt('&nbsp;<span class="errors">%@ error%@</span>', 
             r.errors, (r.errors !== 1 ? 's' : ''));
     }
 
     if (r.warnings > 0) {
-      str += fmt('&nbsp;<span class="warnings">%@ warnings%@</span>',
+      str += utils.fmt('&nbsp;<span class="warnings">%@ warnings%@</span>',
             r.warnings, (r.warnings !== 1 ? 's' : ''));
     }
 
@@ -173,7 +173,7 @@ BrowserLogger.prototype = {
     if ((s.failed + s.errors + s.warnings) === 0) clean = "clean" ;
     
     if (module) name = module.replace(/\n/g, '<br />') + " module: " + test ;
-    name = fmt('%@ - %@msec', name, timings.total_end - timings.total_begin);
+    name = utils.fmt('%@ - %@msec', name, timings.total_end - timings.total_begin);
     
     // place results into a single string to append all at once.
     var logstr = this.logstr ;
@@ -191,12 +191,12 @@ BrowserLogger.prototype = {
                     '</th><th>Result</th></tr>'+
                     '</thead><tbody><tr>'];
     }
-    logstr.push(fmt('<tr class="test %@"><th class="desc" colspan="2">'+
+    logstr.push(utils.fmt('<tr class="test %@"><th class="desc" colspan="2">'+
           '%@ (<span class="passed">%@</span>, <span class="failed">%@</span>,'+
           ' <span class="errors">%@</span>, <span class="warnings">%@</span>)'+
           '</th></tr>', clean, name, s.passed, s.failed, s.errors, s.warnings));
     if(s.failed>0 || s.errors>0){
-      this.errors.push(fmt('<tr class="test %@">'+
+      this.errors.push(utils.fmt('<tr class="test %@">'+
           '<th style="background:grey; color:white" class="desc" colspan="2">'+
           '%@ (<span class="passed">%@</span>, <span class="failed">%@</span>'+
           ', <span class="errors">%@</span>, <span class="warnings">%@</span>'+
@@ -207,18 +207,18 @@ BrowserLogger.prototype = {
     for(idx=0;idx<len;idx++) {
       cur = assertions[idx];
       clean = cur.result === 'passed' ? 'clean' : 'dirty';
-      logstr.push(fmt('<tr class="%@"><td class="desc">%@</td>'
+      logstr.push(utils.fmt('<tr class="%@"><td class="desc">%@</td>'
           +'<td class="action %@">%@</td></tr>', clean, cur.message, cur.result, 
           (cur.result || '').toUpperCase()));
       if(clean=='dirty'){
-        this.errors.push(fmt('<tr class="%@"><td class="desc">%@</td>'
+        this.errors.push(utils.fmt('<tr class="%@"><td class="desc">%@</td>'
         +'<td class="action %@">%@</td></tr>', clean, cur.message, cur.result,
         (cur.result || '').toUpperCase()));
       }
     }
     
     this.testCount++;
-    //this.resultStr = fmt("Running – Completed %@ tests so far.", this.testCount);
+    //this.resultStr = utils.fmt("Running – Completed %@ tests so far.", this.testCount);
   },
   
   assertion: function(newAssertion) {
@@ -313,6 +313,6 @@ BrowserLogger.prototype = {
     this.resultStr = null ;
   }
   
-};
+});
 
 logger = new BrowserLogger();

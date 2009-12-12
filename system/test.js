@@ -4,14 +4,13 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals run typeOf T_FUNCTION T_OBJECT T_HASH A PLATFORM_PACKAGE */
+/*globals run utils timer */
 
-"import package tiki";
-"import package tiki/system";
-"import tiki/system:core core";
+"import core";
+"import utils as utils";
+"import default:timer as timer";
 "export run";
 
-var timer = require(PLATFORM_PACKAGE).timer;
 
 function _beginGroup(logger, moduleName) {
   if (moduleName && logger) {
@@ -69,7 +68,7 @@ var queue = [];
 function _queue(func, arg1, arg2) {
   queue.push({ 
     func: func, 
-    args: A(arguments).slice(1) 
+    args: utils.$A(arguments).slice(1) 
   }); 
 }
 
@@ -105,13 +104,9 @@ run = function run(tests, logger, moduleName) {
   var prevLogger, key, value, inGroup = false;
   
   prevLogger = CoreTest.logger;
-  
-  if (!logger) {
-    if (require('system').PLATFORM === 'classic') {
-      logger = require('browser/logger').logger;
-    } else logger = require('system').console;
-  }
 
+  // log to browser or to console depending
+  if (!logger) logger = require('browser/logger').logger;
   CoreTest.logger = logger;
   
   _queue(_beginPlan, logger, tests);
@@ -121,8 +116,8 @@ run = function run(tests, logger, moduleName) {
     if (key.indexOf('test') !== 0) continue ;
 
     value = tests[key];
-    switch(typeOf(value)) {
-      case T_FUNCTION:
+    switch(utils.typeOf(value)) {
+      case utils.T_FUNCTION:
         if (!inGroup) {
           inGroup = true;
           _queue(_beginGroup, logger, moduleName);
@@ -131,8 +126,8 @@ run = function run(tests, logger, moduleName) {
         _queue(_runTest, tests, key, value, logger);
         break;
         
-      case T_HASH:
-      case T_OBJECT:
+      case utils.T_HASH:
+      case utils.T_OBJECT:
         if (!inGroup) {
           inGroup = true; 
           _queue(_beginGroup, logger, moduleName);

@@ -4,8 +4,9 @@
 # ===========================================================================
 
 config :core_test, 
-  :required       => [:tiki, 'tiki/system'],
+  :required       => [:tiki],
   :debug_required => [],
   :test_required  => [],
   :use_modules    => true,
-  :use_loader     => true
+  :use_loader     => true,
+  :factory_format => :function

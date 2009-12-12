@@ -4,11 +4,15 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals ok AssertionError fmt beget equal notEqual deepEqual deepNotEqual */
+/*globals ok AssertionError utils equal notEqual deepEqual deepNotEqual raises shouldThrow */
 
-"import core utils system/dump";
+"import core system/dump";
+"import utils as utils";
 "export package AssertionError";
-"export package ok equal equals notEqual deepEqual same deepNotEqual shouldThrow";
+"export package ok equal equals notEqual deepEqual same deepNotEqual raises";
+
+// deprecated
+"export shouldThrow";
 
 /**
   @class
@@ -35,32 +39,35 @@
   
   @since SproutCore 1.1
 */
-AssertionError = function AssertionError(actual, expected, message) {
-  if (arguments.length === 1) mixin(this, actual);
-  else {
-    this.actual   = actual;
-    this.expected = expected;
-    this.message  = message;
+AssertionError = utils.extend(Error, {
+  
+  init: function(actual, expected, message) {
+    if (arguments.length === 1) utils.mixin(this, actual);
+    else {
+      this.actual   = actual;
+      this.expected = expected;
+      this.message  = message;
+    }
+
+    this.desc = this.message;
+
+    var ret = ['AssertionError:'];
+    if (this.message) ret.push(this.message);
+    if ((this.actual!==undefined) || (this.expected!==undefined)) {
+      var act = CoreTest.dump(this.actual),
+          exp = CoreTest.dump(this.expected);
+      ret.push(utils.fmt('(actual = "%@" - expected = "%@")', act, exp));
+    }
+    this.message = ret.join(' ');
+
+    return this ;
+  },
+  
+  toString: function() {
+    return this.message;
   }
-
-  this.desc = this.message;
-
-  var ret = ['AssertionError:'];
-  if (this.message) ret.push(this.message);
-  if ((this.actual!==undefined) || (this.expected!==undefined)) {
-    var actual = CoreTest.dump(this.actual),
-        exp    = CoreTest.dump(this.expected);
-    ret.push(fmt('(actual = "%@" - expected = "%@")', actual, exp));
-  }
-  this.message = ret.join(' ');
-
-  return this ;
-};
-
-AssertionError.prototype = beget(Error.prototype);
-AssertionError.toString = function() {
-  return this.message;
-};
+    
+});
 
 // ..........................................................
 // PRIMITIVE ASSERTION API - Provides CommonJS Parity
@@ -75,9 +82,9 @@ AssertionError.toString = function() {
   @param {Object} expected optional expected value to display
   @returns {void}
 */
-ok = CoreTest.ok = function ok(pass, message, actual, expected) {
+ok = CoreTest.ok = function(pass, message, actual, expected) {
   var logger       = CoreTest.logger,
-      shouldThrow  = CoreTest.throwsOnFailure,
+      raises  = CoreTest.throwsOnFailure,
       showVars     = arguments.length > 2,
       str;
 
@@ -90,14 +97,14 @@ ok = CoreTest.ok = function ok(pass, message, actual, expected) {
   
   if (pass) {
     str = showVars ? '%@ (actual = %@, expected = %@)' : '%@';
-    logger.info(fmt(str, message, actual, expected));
+    logger.info(utils.fmt(str, message, actual, expected));
     
-  } else if (shouldThrow) {
+  } else if (raises) {
     throw new AssertionError(actual, expected, message);
     
   } else {
     str = showVars ? '%@ (actual = %@, expected = %@)' : '%@';
-    logger.error(fmt(str, message, actual, expected));
+    logger.error(utils.fmt(str, message, actual, expected));
   }
   
   return pass;
@@ -113,7 +120,7 @@ ok = CoreTest.ok = function ok(pass, message, actual, expected) {
   @returns {Boolean} YES if passed
 */
 equal = CoreTest.equal = function equal(actual, expect, message) {
-  message = fmt('%@ should be equal', message);
+  message = utils.fmt('%@ should be equal', message);
   return CoreTest.ok(actual === expect, message, actual, expect);
 };
 equals = equal ; // QUnit compatibility
@@ -128,7 +135,7 @@ equals = equal ; // QUnit compatibility
   @returns {Boolean} YES if passed
 */
 notEqual = CoreTest.notEqual = function notEqual(actual, expect, message) {
-  message = fmt('%@ should not be equal', message);
+  message = utils.fmt('%@ should not be equal', message);
   return CoreTest.ok(actual !== expect, message, actual, expect);
 };
 
@@ -142,7 +149,7 @@ notEqual = CoreTest.notEqual = function notEqual(actual, expect, message) {
   @returns {Boolean} YES if passed
 */
 deepEqual = CoreTest.deepEqual = function deepEqual(actual, expect, msg) {
-  msg = fmt('%@ should be deepEqual', msg);
+  msg = utils.fmt('%@ should be deepEqual', msg);
   return CoreTest.ok(CoreTest.equiv(actual, expect), msg, actual, expect);
 } ;
 same = deepEqual; // QUnit compatibility 
@@ -157,7 +164,7 @@ same = deepEqual; // QUnit compatibility
   @returns {Boolean} YES if passed
 */
 deepNotEqual = function deepNotEqual(actual, expect, msg) {
-  message = fmt('%@ should not be deepEqual', message);
+  msg = utils.fmt('%@ should not be deepEqual', msg);
   return CoreTest.ok(!CoreTest.equiv(actual,expect), msg, actual, expect);
 } ;
 CoreTest.deepNotEqual = deepNotEqual;
@@ -171,7 +178,7 @@ CoreTest.deepNotEqual = deepNotEqual;
   @param {String} msg optional additonal message
   @returns {Boolean} YES if passed
 */
-shouldThrow = function shouldThrow(callback, expected, msg) {
+raises = function(callback, expected, msg) {
   var actual = false ;
   
   try {
@@ -181,13 +188,13 @@ shouldThrow = function shouldThrow(callback, expected, msg) {
   }
   
   if (expected===false) {
-    CoreTest.ok(actual===false, fmt("%@ expected no exception, actual %@", msg, actual));
+    CoreTest.ok(actual===false, utils.fmt("%@ expected no exception, actual %@", msg, actual));
   } else if (expected===Error || expected===null || expected===true) {
-    CoreTest.ok(!!actual, fmt("%@ expected exception, actual %@", msg, actual));
+    CoreTest.ok(!!actual, utils.fmt("%@ expected exception, actual %@", msg, actual));
   } else {
     equals(actual, expected, msg);
   }
 };
-CoreTest.shouldThrow = shouldThrow;
-
+CoreTest.raises = raises;
+shouldThrow = CoreTest.shouldThrow = raises;
 
