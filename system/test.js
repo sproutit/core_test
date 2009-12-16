@@ -10,6 +10,7 @@
 "import utils as utils";
 "import default:timer as timer";
 "export run";
+"export package start stop";
 
 
 function _beginGroup(logger, moduleName) {
@@ -20,6 +21,8 @@ function _beginGroup(logger, moduleName) {
   
   return true;
 }
+
+var _finishTest = null;
 
 function _runTest(tests, testName, testFunc, logger) {
   var inGroup = testName && logger;
@@ -40,12 +43,20 @@ function _runTest(tests, testName, testFunc, logger) {
     if (logger) logger.error(e);
   }
   
-  CoreTest.logger = oldLogger;
+  _finishTest = function(errmsg) {
+      if (errmsg && logger) {
+          logger.error(errmsg);
+      }
+
+      if (inGroup) {
+        if (logger.testDidEnd) logger.testDidEnd(testName);
+        else if (logger.groupEnd) logger.groupEnd(testName);
+      }
+      CoreTest.logger = oldLogger;
+      _finishTest = null;
+  };
   
-  if (inGroup) {
-    if (logger.testDidEnd) logger.testDidEnd(testName);
-    else if (logger.groupEnd) logger.groupEnd(testName);
-  }
+  if (!blocking) _finishTest();
 }
 
 function _endGroup(logger, moduleName) {
@@ -64,6 +75,8 @@ function _endPlan(logger, plan) {
 }
 
 var queue = [];
+var blocking = false;
+var currentTimer = null;
 
 function _queue(func, arg1, arg2) {
   queue.push({ 
@@ -79,9 +92,10 @@ function _flush() {
   var start = new Date().getTime(),
       opts;
   while(((new Date().getTime() - start) < 100) && (opts = queue.shift())) {
+    if (blocking) break;
     if (opts) opts.func.apply(this, opts.args);
   }
-  if (queue.length>0) _schedule();
+  if (!blocking && queue.length>0) _schedule();
 }
 
 function _schedule() {
@@ -90,6 +104,48 @@ function _schedule() {
     timer.schedule(0, _flush);
   }
 }
+
+/**
+  Restarts the test running after pausing for asynchronous events
+  (see stop()).
+  
+  @returns {void}
+*/
+function start() {
+    _start();
+}
+
+function _start(errorForPreviousTest) {
+    // A slight delay, to avoid any current callbacks
+    timer.schedule(13, function() {
+        if (currentTimer) {
+            timer.cancel(currentTimer);
+        }
+        
+        if (_finishTest) _finishTest(errorForPreviousTest);
+ 
+        blocking = false;
+        _schedule();
+    });
+}
+
+/**
+  Stops running the queue of tests while waiting for asynchronous
+  events to finish. start() should be called once the asynchronous
+  behavior is done. A test failure will be logged if start is not
+  called before the timeout is reached.
+  
+  @param {Number} timeout milliseconds in which this test should complete
+  @returns {void}
+*/
+function stop(timeout) {
+    blocking = true;
+    
+    currentTimer = timer.schedule(timeout, function() {
+        _start("Test timed out");
+    });
+}
+
 
 /**
   Runs any tests defined in the passed array of unit tests.  Optionally pass
@@ -146,3 +202,5 @@ run = function run(tests, logger, moduleName) {
 };
 
 CoreTest.run = run; // preferred way to access this
+CoreTest.stop = stop;
+CoreTest.start = start;
