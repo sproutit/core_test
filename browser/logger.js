@@ -149,9 +149,9 @@ BrowserLogger = utils.extend({
         t = this._tests,
         a = this._assertions;
         
-    m = m ? m[m.length-1] : '' ;
-    t = t ? t[t.length-1] : '';
-    a = a ? a[a.length-1] : {};
+    m = (m && m.length>0) ? m[m.length-1] : '' ;
+    t = (t && t.length>0) ? t[t.length-1] : '';
+    a = (a && a.length>0) ? a[a.length-1] : {};
      
     this._timings.total_end = new Date().getTime();
     this.planDidRecord(p, m, t, a);
