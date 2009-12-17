@@ -5,10 +5,7 @@
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
 
-/*globals CoreTest */
-
-"import core";
-"export package";
+var CoreTest = require('core');
 
 /**
   Tests for equality any JavaScript type and structure without unexpected 

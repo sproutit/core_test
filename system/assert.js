@@ -4,15 +4,15 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals ok AssertionError utils equal notEqual deepEqual deepNotEqual raises shouldThrow */
+/*globals module exports */
 
-"import core system/dump";
-"import utils as utils";
-"export package AssertionError";
-"export package ok equal equals notEqual deepEqual same deepNotEqual raises";
+var CoreTest = require('core');
+var utils = require('utils');
+var AssertionError, ok, equal, equals, 
+    notEqual, deepEqual, sameEqual, deepNotEqual, raises, shouldThrow;
 
-// deprecated
-"export shouldThrow";
+require('system/dump');
+require('system/equiv'); 
 
 /**
   @class
@@ -68,6 +68,7 @@ AssertionError = utils.extend(Error, {
   }
     
 });
+exports.AssertionError = CoreTest.AssertionError = AssertionError;
 
 // ..........................................................
 // PRIMITIVE ASSERTION API - Provides CommonJS Parity
@@ -82,7 +83,7 @@ AssertionError = utils.extend(Error, {
   @param {Object} expected optional expected value to display
   @returns {void}
 */
-ok = CoreTest.ok = function(pass, message, actual, expected) {
+ok = function(pass, message, actual, expected) {
   var logger       = CoreTest.logger,
       raises  = CoreTest.throwsOnFailure,
       showVars     = arguments.length > 2,
@@ -109,6 +110,7 @@ ok = CoreTest.ok = function(pass, message, actual, expected) {
   
   return pass;
 };
+CoreTest.ok = exports.ok = ok;
 
 /**
   Asserts that the actual value (first value) is identical to the expected 
@@ -119,11 +121,12 @@ ok = CoreTest.ok = function(pass, message, actual, expected) {
   @param {String} message optional message
   @returns {Boolean} YES if passed
 */
-equal = CoreTest.equal = function equal(actual, expect, message) {
+equal = function equal(actual, expect, message) {
   message = utils.fmt('%@ should be equal', message);
   return CoreTest.ok(actual === expect, message, actual, expect);
 };
-equals = equal ; // QUnit compatibility
+CoreTest.equal = exports.equal = equal;
+CoreTest.equals = exports.equals = equal; // Qunit compatibility
 
 /**
   Asserts that the actual value is NOT identical to the expected value using 
@@ -134,10 +137,11 @@ equals = equal ; // QUnit compatibility
   @param {String} message optional message
   @returns {Boolean} YES if passed
 */
-notEqual = CoreTest.notEqual = function notEqual(actual, expect, message) {
+notEqual = function(actual, expect, message) {
   message = utils.fmt('%@ should not be equal', message);
   return CoreTest.ok(actual !== expect, message, actual, expect);
 };
+CoreTest.notEqual = exports.notEqual = notEqual;
 
 /**
   Asserts the the actual value is the same as the expected value using a 
@@ -148,11 +152,12 @@ notEqual = CoreTest.notEqual = function notEqual(actual, expect, message) {
   @param {String} msg optional message
   @returns {Boolean} YES if passed
 */
-deepEqual = CoreTest.deepEqual = function deepEqual(actual, expect, msg) {
+deepEqual = function(actual, expect, msg) {
   msg = utils.fmt('%@ should be deepEqual', msg);
   return CoreTest.ok(CoreTest.equiv(actual, expect), msg, actual, expect);
 } ;
-same = deepEqual; // QUnit compatibility 
+CoreTest.deepEqual = exports.deepEqual = deepEqual;
+CoreTest.same = exports.same = deepEqual; // QUnit compatibility 
 
 /**
   Asserts the the actual value is NOT the same as the expected value using a 
@@ -163,11 +168,11 @@ same = deepEqual; // QUnit compatibility
   @param {String} msg optional message
   @returns {Boolean} YES if passed
 */
-deepNotEqual = function deepNotEqual(actual, expect, msg) {
+deepNotEqual = function(actual, expect, msg) {
   msg = utils.fmt('%@ should not be deepEqual', msg);
   return CoreTest.ok(!CoreTest.equiv(actual,expect), msg, actual, expect);
 } ;
-CoreTest.deepNotEqual = deepNotEqual;
+exports.deepNotEqual = CoreTest.deepNotEqual = deepNotEqual;
 
 /**
   Asserts that the passed callback will throw the an error with the expected
@@ -195,6 +200,6 @@ raises = function(callback, expected, msg) {
     equals(actual, expected, msg);
   }
 };
-CoreTest.raises = raises;
-shouldThrow = CoreTest.shouldThrow = raises;
+CoreTest.raises = exports.raises = raises;
+CoreTest.shouldThrow = exports.shouldThrow = raises; // old CoreTest compat
 

@@ -5,8 +5,6 @@
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
 
-"export package";
-
 // These utility methods are included from the SproutCore's foundation to 
 // make it easier write unit tests.  They only install themselves if a method
 // has not already been defined.

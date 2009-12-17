@@ -4,12 +4,13 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals CoreTest BrowserLogger logger utils */
+/*globals exports */
 
-"import core browser/jquery";
-"import utils as utils";
-"export package BrowserLogger";
-"export logger";
+var CoreTest = require('core'),
+    $ = require('browser/jquery'),
+    utils = require('utils');
+
+var BrowserLogger, logger;
 
 /**
   The BrowserLogger can be used to log test output to the main web page.  
@@ -315,4 +316,5 @@ BrowserLogger = utils.extend({
   
 });
 
-logger = new BrowserLogger();
+exports.BrowserLogger = BrowserLogger;
+exports.logger = new BrowserLogger();

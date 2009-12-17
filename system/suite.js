@@ -5,11 +5,10 @@
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
 
-/*globals CoreTest module utils */
+var CoreTest = require('core'),
+    utils    = require('utils');
 
-"import core system/plan";
-"import utils as utils";
-"export package";
+require('system/plan'); 
 
 /** @class
 
@@ -223,7 +222,7 @@ CoreTest.Suite = /** @scope CoreTest.Suite.prototype */ {
   */
   module: function(desc) {
     var T = this ;
-    module(T.desc(desc), {
+    CoreTest.module(T.desc(desc), {
       setup: function() { T.setup(); },
       teardown: function() { T.teardown(); }
     });

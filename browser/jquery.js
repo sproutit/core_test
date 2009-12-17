@@ -5,7 +5,7 @@
 // minor effort.
 /*globals exports */
 
-"export jQuery $";
+var jQuery, $;
 
 /*!
  *
@@ -3558,3 +3558,7 @@ jQuery.each([ "Height", "Width" ], function(i, name){
 
 });
 
+exports = module.exports = jQuery;
+exports.jQuery = jQuery;
+exports.$ = $ ;
+ 

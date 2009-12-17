@@ -4,13 +4,11 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals run utils timer */
+/*globals exports */
 
-"import core";
-"import utils as utils";
-"import default:timer as timer";
-"export run";
-"export package start stop";
+var CoreTest = require('core'),
+    utils    = require('utils'),
+    timer    = require.using('default', 'timer');
 
 
 function _beginGroup(logger, moduleName) {
@@ -57,6 +55,10 @@ function _runTest(tests, testName, testFunc, logger) {
   };
   
   if (!blocking) _finishTest();
+  if (inGroup) {
+    if (logger.testDidEnd) logger.testDidEnd(testName);
+    else if (logger.groupEnd) logger.groupEnd(testName);
+  }
 }
 
 function _endGroup(logger, moduleName) {
@@ -156,7 +158,7 @@ function stop(timeout) {
   @param {String} moduleName optional moduleName to use when grouping tests
   @returns {void}
 */
-run = function run(tests, logger, moduleName) {
+var run = function run(tests, logger, moduleName) {
   var prevLogger, key, value, inGroup = false;
   
   prevLogger = CoreTest.logger;
@@ -204,3 +206,4 @@ run = function run(tests, logger, moduleName) {
 CoreTest.run = run; // preferred way to access this
 CoreTest.stop = stop;
 CoreTest.start = start;
+exports.run = CoreTest.run = run; // preferred way to access this

@@ -4,10 +4,12 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals CoreTest Plan plan module setup teardown test */
 
-"import core";
-"export package Plan test module plan setup teardown";
+var CoreTest = require('core'),
+    utils    = require('utils');
+var Plan;
+
+require('system/test');
 
 /**
   This module defines some helper methods for describing a test plan.  To 
@@ -20,12 +22,11 @@
   plan, call plan('test name').  When you are done, just call plan.run();
 */
 
-Plan = function(id) {
-  this.id = id;
-  return this;
-};
-
-Plan.prototype = {
+Plan = utils.extend({
+  
+  init: function(id) {
+    this.id = id;
+  },
   
   isFocused: false,
   
@@ -38,8 +39,8 @@ Plan.prototype = {
   */
   begin: function() {    
     if (this.isFocused) return this ;
-    this._lastPlan = CoreTest.plan;
-    CoreTest.plan = this ;
+    this._lastPlan = CoreTest.currentPlan;
+    CoreTest.currentPlan = this ;
     this.isFocused = true;
     return this ;
   },
@@ -51,7 +52,7 @@ Plan.prototype = {
   */
   end: function() {
     if (!this.isFocused) return this; 
-    CoreTest.plan = this._lastPlan;
+    CoreTest.currentPlan = this._lastPlan;
     this._lastPlan = null;
     this.isFocused = false;
     return this ;
@@ -67,7 +68,7 @@ Plan.prototype = {
     this._module = this._tests = this._setup = this._teardown = null; // reset
 
     var logger = this.logger;
-    require('system/test').run(this, logger);
+    CoreTest.run(this, logger);
     
     return this ;
   },
@@ -135,7 +136,12 @@ Plan.prototype = {
     };
   }
   
-};
+});
+CoreTest.Plan = Plan;
+
+// ..........................................................
+// PLAN DSL
+// 
 
 /**
   Call this method to start a new test plan.  This should appear at the top of
@@ -144,7 +150,7 @@ Plan.prototype = {
   @param {String} planName the name of the new plan (optional)
   @returns {Plan} the new plan instance
 */
-plan = function plan(planName) { 
+var plan = function plan(planName) { 
   return new Plan(planName).begin();
 };
 
@@ -155,7 +161,7 @@ plan = function plan(planName) {
   @returns {Plan} the plan that was just ended
 */
 plan.end = function() {
-  return CoreTest.plan.end();
+  return CoreTest.currentPlan.end();
 };
 
 /**
@@ -164,7 +170,7 @@ plan.end = function() {
   @returns {Plan} the plan that was run.
 */
 plan.run = function() {
-  return CoreTest.plan.end().run();
+  return CoreTest.currentPlan.end().run();
 };
 
 /**
@@ -180,6 +186,8 @@ plan.logger = function(logger) {
   return logger;  
 };
 
+CoreTest.plan = plan;
+
 /**
   Begins a new module in the plan.  Optionally pass a hash with setup and 
   teardown methods for the module.  Future tests will be placed inside of 
@@ -189,11 +197,12 @@ plan.logger = function(logger) {
   @param {Hash} opts optional setup and teardown methods for module
   @returns {void}
 */
-module = function module(moduleName, opts) {
-  if (!CoreTest.plan) plan('unknown'); // begin a plan if needed
-  CoreTest.plan.module(moduleName);
-  if (opts && opts.setup) CoreTest.plan.setup(opts.setup);
-  if (opts && opts.teardown) CoreTest.plan.teardown(opts.teardown);
+CoreTest.module = function(moduleName, opts) {
+  var cp = CoreTest.currentPlan;
+  if (!cp) cp = CoreTest.plan('unknown'); // begin a plan 
+  cp.module(moduleName);
+  if (opts && opts.setup) cp.setup(opts.setup);
+  if (opts && opts.teardown) cp.teardown(opts.teardown);
 };
 
 /**
@@ -203,9 +212,9 @@ module = function module(moduleName, opts) {
   @param {Function} func setup function
   @returns {void}
 */
-setup = function setup(func) {
-  if (!CoreTest.plan) plan('unknown'); // begin a plan if needed
-  CoreTest.plan.setup(func);
+CoreTest.setup = function(func) {
+  if (!CoreTest.currentPlan) CoreTest.plan('unknown'); // begin a plan
+  CoreTest.currentPlan.setup(func);
 };
 
 /**
@@ -215,9 +224,9 @@ setup = function setup(func) {
   @param {Function} func teardown function
   @returns {void}
 */
-teardown = function teardown(func) {
-  if (!CoreTest.plan) plan('unknown'); // begin a plan if needed
-  CoreTest.plan.teardown(func);
+CoreTest.teardown = function(func) {
+  if (!CoreTest.currentPlan) CoreTest.plan('unknown'); // begin a plan
+  CoreTest.currentPlan.teardown(func);
 };
 
 /**
@@ -227,7 +236,7 @@ teardown = function teardown(func) {
   @param {Function} func actual unit test to run
   @returns {void}
 */
-test = function test(desc, func) {
-  if (!CoreTest.plan) plan('unknown'); // begin a plan if needed
-  CoreTest.plan.addTest(desc, func);
+CoreTest.test = function(desc, func) {
+  if (!CoreTest.currentPlan) CoreTest.plan('unknown'); // begin a plan
+  CoreTest.currentPlan.addTest(desc, func);
 };
