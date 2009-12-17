@@ -197,7 +197,7 @@ raises = function(callback, expected, msg) {
   } else if (expected===Error || expected===null || expected===true) {
     CoreTest.ok(!!actual, utils.fmt("%@ expected exception, actual %@", msg, actual));
   } else {
-    equals(actual, expected, msg);
+    CoreTest.equal(actual, expected, msg);
   }
 };
 CoreTest.raises = exports.raises = raises;
