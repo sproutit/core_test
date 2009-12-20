@@ -7,7 +7,7 @@
 /*globals CoreTest exports module */
 
 // Notify the build tools of the exports we plan to manually define
-"use exports CoreTest ok same equal notEqual deepEqual deepNotEqual raises equals shouldThrow plan module setup teardown test";
+"use exports CoreTest ok same equal notEqual deepEqual deepNotEqual raises equals shouldThrow plan module setup teardown test htmlbody expect";
 
 // Core exported API
 exports = module.exports = require('core');

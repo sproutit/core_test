@@ -203,3 +203,5 @@ raises = function(callback, expected, msg) {
 CoreTest.raises = exports.raises = raises;
 CoreTest.shouldThrow = exports.shouldThrow = raises; // old CoreTest compat
 
+// expect does nothing in CoreTest
+CoreTest.expect = exports.expect = function() {}; 

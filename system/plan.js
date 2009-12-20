@@ -114,6 +114,36 @@ Plan = utils.extend({
   },
   
   /**
+    Adds some html to the page body.  Useful for testing low-level HTML-related
+    items.  (such as for CoreQuery).
+
+    @param {String} string the html to insert
+  */
+  htmlbody: function(string) {
+    this._htmlbodyString = string;
+  },
+  
+  _htmlbody: function(string) {
+    var $ = require('browser/jquery');
+    var html = $(string),
+        body = $('body')[0];
+        
+    // first, find the first element with id 'htmlbody-begin'  if exists,
+    // remove everything after that to reset...
+    var begin = $('body #htmlbody-begin')[0];
+    if (!begin) {
+      begin = $('<div id="htmlbody-begin"></div>')[0];
+      body.appendChild(begin);
+    } else {
+      while(begin.nextSibling) body.removeChild(begin.nextSibling);
+    }
+    begin = null; 
+
+    // now append new content
+    html.each(function() { body.appendChild(this); });
+  },
+  
+  /**
     Adds a new test to the test plan in the current module.
     
     @param {String} testName the test name
@@ -126,10 +156,14 @@ Plan = utils.extend({
     if (!this._module) this.module('default'); 
 
     // generate a wrap with setup and teardown...
-    var setup = this._setup, teardown = this._teardown;
+    var setup    = this._setup, 
+        teardown = this._teardown, 
+        html     = this._htmlbodyString,
+        htmlbody = this._htmlbody;
     
     testName = "test " + testName;
     this._tests[testName] = function() {
+      if (html) htmlbody(html);
       if (setup) setup();
       if (func) func();
       if (teardown) teardown();
@@ -239,4 +273,9 @@ CoreTest.teardown = function(func) {
 CoreTest.test = function(desc, func) {
   if (!CoreTest.currentPlan) CoreTest.plan('unknown'); // begin a plan
   CoreTest.currentPlan.addTest(desc, func);
+};
+
+CoreTest.htmlbody = function(str) {
+  if (!CoreTest.currentPlan) CoreTest.plan('unknown'); // begin a plan
+  CoreTest.currentPlan.htmlbody(str);
 };
