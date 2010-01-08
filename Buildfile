@@ -9,4 +9,5 @@ config :core_test,
   :test_required  => [],
   :use_modules    => true,
   :use_loader     => true,
-  :factory_format => :function
+  :factory_format => :function,
+  :module_lib  => ['lib'] # make compatible w/ packages.json
