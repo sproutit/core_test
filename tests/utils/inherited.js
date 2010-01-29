@@ -20,12 +20,11 @@ var keysFor = function(obj) {
 
 Ct.module("core_test:utils inherited functions");
 
-Ct.test("should have all properties found in tiki module", function() {
-  var tk = require('tiki'), keys = keysFor(tk), utilKeys = keysFor(utils),
-      len = keys.length, idx;
-      
-  for(idx=0;idx<len;idx++) {
-    Ct.ok(utilKeys.indexOf(keys[idx]), 'utils should contain '+keys[idx]);
+Ct.test("should have all properties found in tiki module", function(t) {
+  var tk = require('tiki'), key;
+  for(key in tk) {
+    if (!tk.hasOwnProperty(key)) continue;
+    t.notStrictEqual(utils[key], undefined, 'utils should contain ' + key);
   }
 });
 

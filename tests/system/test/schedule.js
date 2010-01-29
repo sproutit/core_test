@@ -137,8 +137,6 @@ function validateLogger(t, shouldHaveSetup, shouldHaveTest, shouldHaveTeardown) 
   
   first.resolve(); // should execute test
 
-  console.log(logger.history);
-  
   item  = logger.find({ mode: Ct.SETUP_MODE, test: 'test', message: 'setup' });
   if (shouldHaveSetup) {
     t.ok(item, 'logger should have setup in history');
