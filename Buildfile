@@ -11,4 +11,5 @@ config :core_test,
   :use_loader     => true,
   :factory_format => :function,
   :module_lib  => ['lib'], # make compatible w/ packages.json
-  :combine_javascript => true
+  :combine_javascript => true,
+  :combine_stylesheets => true

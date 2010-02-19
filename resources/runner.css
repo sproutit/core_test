@@ -1,14 +1,3 @@
-/* @override 
-	http://localhost:4020/static/core_test/en/a81828ebe2182e13c732c86f19ade2556d7e74a0/stylesheet.css
-	http://localhost:4020/static/core_test/en/f49793af16271b795e7816b081d9c674a3505ad1/stylesheet.css
-	http://localhost:4020/static/core_test/en/1541d83903b5e2ea1e1e38122a6a5c10e524bfbe/stylesheet.css
-	http://localhost:4020/static/core_test/en/42c5f78cc17e58582ccf7c1eb5847301dd5869c4/stylesheet.css
-	http://localhost:4020/static/core_test/en/47c7d0f218ea6610514574b7ab0beaec26a5a73e/stylesheet.css
-	http://localhost:4020/static/core_test/en/947a7951c376d74b30b8cb906395b23d1ce12cdb/stylesheet.css
-	http://localhost:4020/static/core_test/en/4851bdb3f3ce75e7db668238dbd0b48700ac8a39/stylesheet.css
-	http://localhost:4020/static/core_test/en/f7f176af73d4f0e51e481f30783e0f38cbd7da04/stylesheet.css
-	http://localhost:4020/static/core_test/en/ce81975451d68bed62f423d5d8a5df4328f278b6/stylesheet.css
-*/
 
 .core-test {
   font: 13px/16px "Helvetica", Verdana, Arial, sans-serif;
@@ -54,8 +43,6 @@
 .core-test ul.detail li.plan {
 	margin: 4px 0px;
 	margin-left: -20px;
-	padding-bottom: 4px;
-	border-bottom: 1px #ccc solid;
 }
 
 /* plan name is usually useless so just hide it and leave a small space */
