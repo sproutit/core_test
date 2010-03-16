@@ -13,7 +13,7 @@ var Ct = require('core'),
 Ct.module("equiv");
 
 
-Ct.test("Primitive types and constants", function (t) {
+Ct.test("Primitive types and constants", function (t, done) {
     t.equal(Ct.equiv(null, null), true, "null");
     t.equal(Ct.equiv(null, {}), false, "null");
     t.equal(Ct.equiv(null, undefined), false, "null");
@@ -114,9 +114,11 @@ Ct.test("Primitive types and constants", function (t) {
     t.equal(Ct.equiv({a:1}, new Object()), false, "short annotation VS new annotation");
     t.equal(Ct.equiv({a:undefined}, new Object()), false, "short annotation VS new annotation");
     t.equal(Ct.equiv(new Object(), {a:undefined}), false, "short annotation VS new annotation");
+    
+    done();
 });
 
-Ct.test("Objects Basics.", function(t) {
+Ct.test("Objects Basics.", function(t, done) {
     t.equal(Ct.equiv({}, {}), true);
     t.equal(Ct.equiv({}, null), false);
     t.equal(Ct.equiv({}, undefined), false);
@@ -148,10 +150,12 @@ Ct.test("Objects Basics.", function(t) {
             a: [{ bat: undefined }]
         }
     ), false);
+    
+    done();
 });
 
 
-Ct.test("Arrays Basics.", function(t) {
+Ct.test("Arrays Basics.", function(t, done) {
 
     t.equal(Ct.equiv([], []), true);
 
@@ -326,9 +330,10 @@ Ct.test("Arrays Basics.", function(t) {
                                 ]
                             ]]]),
                             false, "Multidimensional");
+    done();
 });
 
-Ct.test("Functions.", function(t) {
+Ct.test("Functions.", function(t, done) {
     var f0 = function () {};
     var f1 = function () {};
 
@@ -349,10 +354,12 @@ Ct.test("Functions.", function(t) {
     t.equal(Ct.equiv(function() {}, undefined), false);
     t.equal(Ct.equiv(function() {}, null), false);
     t.equal(Ct.equiv(function() {}, {}), false);
+    
+    done();
 });
 
 
-Ct.test("Date instances.", function(t) {
+Ct.test("Date instances.", function(t, done) {
     // Date, we don't need to test Date.parse() because it returns a number.
     // Only test the Date instances by setting them a fix date.
     // The date use is midnight January 1, 1970
@@ -371,10 +378,11 @@ Ct.test("Date instances.", function(t) {
     t.equal(Ct.equiv(d1, d2), true);
     // test different date and different instances difference
     t.equal(Ct.equiv(d1, d3), false);
+    done();
 });
 
 
-Ct.test("RegExp.", function(t) {
+Ct.test("RegExp.", function(t, done) {
     // Must test cases that imply those traps:
     // var a = /./;
     // a instanceof Object;        // Oops
@@ -452,10 +460,11 @@ Ct.test("RegExp.", function(t) {
     var re = / /;
     t.equal(Ct.equiv(re, function () {}), false, "Regex internal");
     t.equal(Ct.equiv(re, {}), false, "Regex internal");
+    done();
 });
 
 
-Ct.test("Complex Objects.", function(t) {
+Ct.test("Complex Objects.", function(t, done) {
 
     function fn1() {
         return "fn1";
@@ -950,10 +959,12 @@ Ct.test("Complex Objects.", function(t) {
     t.equal(Ct.equiv(same1, diff4), false);
     t.equal(Ct.equiv(same1, diff5), false);
     t.equal(Ct.equiv(diff5, diff1), false);
+    
+    done();
 });
 
 
-Ct.test("Complex Arrays.", function(t) {
+Ct.test("Complex Arrays.", function(t, done) {
 
     function fn() {
     }
@@ -1136,10 +1147,11 @@ Ct.test("Complex Arrays.", function(t) {
                     b: {}
                 }
             }, {}]]]), false);
+  done();
 });
 
 
-Ct.test("Prototypal inheritance", function(t) {
+Ct.test("Prototypal inheritance", function(t, done) {
     function Gizmo(id) {
         this.id = id;
     }
@@ -1185,10 +1197,12 @@ Ct.test("Prototypal inheritance", function(t) {
 
     // Make sure this is still true !important
     t.equal(Ct.equiv(function () {}, function () {}), false);
+    
+    done();
 });
 
 
-Ct.test("Instances", function(t) {
+Ct.test("Instances", function(t, done) {
     function A() {} 
     var a1 = new A(); 
     var a2 = new A(); 
@@ -1240,10 +1254,12 @@ Ct.test("Instances", function(t) {
     t.equal(Ct.equiv(car, carDiff), false);
     t.equal(Ct.equiv(car, carSame), true);
     t.equal(Ct.equiv(car, human), false);
+    
+    done();
 });
 
 
-Ct.test("Complex Instances Nesting (with function value in literals and/or in nested instances)", function(t) {
+Ct.test("Complex Instances Nesting (with function value in literals and/or in nested instances)", function(t, done) {
     function A(fn) {
         this.a = {};
         this.fn = fn;
@@ -1360,11 +1376,11 @@ Ct.test("Complex Instances Nesting (with function value in literals and/or in ne
     var e1 = new E(function () {});
     var e2 = new E(function () {});
     t.equal(Ct.equiv(e1, e2), true);
-
+    done();
 });
 
 
-Ct.test("Test that must be done at the end because they extend some primitive's prototype", function(t) {
+Ct.test("Test that must be done at the end because they extend some primitive's prototype", function(t, done) {
     // Try that a function looks like our regular expression.
     // This tests if we check that a and b are really both instance of RegExp
     Function.prototype.global = true;
@@ -1376,6 +1392,8 @@ Ct.test("Test that must be done at the end because they extend some primitive's 
     // This test will ensures it works in both ways, and ALSO especially that we can make differences
     // between RegExp and Function constructor because typeof on a RegExpt instance is "function"
     t.equal(Ct.equiv(function () {}, re), false, "Same conversely, but ensures that function and regexp are distinct because their constructor are different");
+    
+    done();
 });
 
 

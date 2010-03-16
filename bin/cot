@@ -1,0 +1,179 @@
+#!/usr/bin/env seed-node
+
+/*globals process __filename __dirname */
+
+// Make CoreTest the default package
+require.seed.register(__dirname, '..');
+
+var SYS   = require('default:sys'),
+    PATH  = require('default:path'),
+    FS  = require('default:fs'),
+    UTILS = require('core_test:utils'),
+    SEED  = require.seed;
+
+/*
+  We start with any paths you pass or the current working directory and walk
+  up the tree looking for a package.  Then we try to load and run any tests
+  in the paths that you named.
+*/
+
+var paths = process.argv.slice(2);
+var cwd   = process.cwd();
+
+// really simple arguments processing for now
+var MAP = {
+  '--verbose': ['VERBOSE', true],
+  '--color': ['COLOR', true],
+  '--quiet': ['VERBOSE', false],
+  '--no-color': ['COLOR', false],
+  '-v': ['VERBOSE', true],
+  '-c': ['COLOR', true],
+  '-q': ['VERBOSE', false]
+};
+
+paths = paths.filter(function(p) {
+  var opt = MAP[p]
+  if (opt) {
+    process.env[opt[0]] = opt[1];
+    return false;
+  } else return true;
+});
+
+if (paths.length === 0) paths = ['.']; // assume cwd() only
+paths = paths.map(function(path) {
+  if (path[0] !== '/') path = PATH.join(cwd, path);
+  return PATH.normalize(path); 
+});
+
+// finds the nearest package in the named path, returning the package instance
+function nearestPackage(path, done) {
+  
+  function checkPath(path) {
+    if (path === '.') return done(null, null); // not found
+    
+    var dirname = PATH.dirname(path);
+    var packageJsonPath = PATH.join(path, 'package.json');
+    PATH.exists(packageJsonPath, function(exists) {
+      if (!exists) return checkPath(dirname);
+      SEED.openPackage(path, function(err, pkg) {
+        if (err) return done(err);
+        if (!pkg) return checkPath(dirname);
+        else return done(null, pkg);
+      });
+    });
+  }
+  
+  checkPath(path);
+}
+
+// expands the named path to include all any included files (if path is a dir)
+// looks for filenames ending in _EXPECTS.  Return an error if path does not 
+// exists
+function glob(path, done) {
+  PATH.exists(path, function(exists) {
+    if (!exists) return done(path+" does not exist");
+    FS.stat(path, function(err, stats) {
+      if (err) return done(err);
+      if (!stats.isDirectory()) return done(null, [path]);
+      
+      var ret = [];
+      FS.readdir(path, function(err, dirnames) {
+        if (err) return done(err);
+        if (!dirnames) return done(null, null);
+        UTILS.each(dirnames, function(name, done) {
+          if (name[0]==='.') return done(); // skip hidden files
+          glob(PATH.join(path, name), function(err, globbed) {
+            if (err) return done(err);
+            if (globbed) ret = ret.concat(globbed);
+            return done();
+          });
+          
+        })(function(err) {
+          if (err) return done(err);
+          return done(null, ret); 
+        });
+      });
+    });
+  });
+}
+
+var EXPECTS = ['test', 'spec'];
+function filterGlob(paths) {
+  if (!paths) return [];
+  else return paths; 
+  
+  // no filtering for now..
+  
+  // return paths.filter(function(path) {
+  //   var ext = PATH.extname(path),
+  //       filename = PATH.basename(path), idx;
+  //   if (ext && ext.length>0) filename = filename.slice(0, 0-ext.length);
+  //   idx = filename.lastIndexOf('_');
+  //   if (idx<0) return false;
+  //   return EXPECTS.indexOf(filename.slice(idx+1).toLowerCase())>=0;
+  // });
+}
+
+// now loop through each path and work on it...
+UTILS.each(paths, function(path, done) {
+
+  // first expand path to include any subpaths
+  (function(next) {
+    glob(path, function(err, paths) {
+      if (err) return done(err);
+      else return next(filterGlob(paths));
+    });
+
+  // next find a matching package if possible and then require files
+  })(function(paths) {
+
+    nearestPackage(path, function(err, pkg) {
+      if (err) return done(err); 
+      
+      // if we're not in a package, just require each path.  It's the scripts
+      // problem if it doesn't have the write context
+      if (!pkg) {
+        paths.forEach(function(path) { require(path); });
+        
+      // inside of a package get the list of test directories and filter
+      // glob based on that
+      } else {
+        var roots = pkg.info('test');
+        if (!roots) {
+          return done("Package "+pkg.name()+"-"+pkg.version()+" does not define any test directories");
+        }
+        
+        roots = roots.map(function(dirname) { 
+          return PATH.join(pkg.path, dirname);
+        });
+        
+        paths = paths.map(function(path) {
+          for(var idx=0;idx<roots.length;idx++) {
+            var root = roots[idx];
+            if (path.indexOf(root)===0) {
+              path = path.slice(root.length+2, 0-PATH.extname(path).length);
+              return '~test/'+path;
+            }
+          }
+          return null;
+        });
+
+        var seen = {};
+        paths.forEach(function(moduleId) {
+          if (seen[moduleId]) return; // don't do it twice
+          seen[moduleId] = true;
+          SEED.require(moduleId, null, pkg);
+        });
+        
+      }
+      
+      return done();
+    });
+  });
+  
+})(function(err) {
+  SYS.puts(''); // one newline
+  if (err) SYS.puts('ERROR: '+err);
+});
+  
+  

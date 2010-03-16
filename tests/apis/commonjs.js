@@ -55,7 +55,7 @@ dummy.restore(); // restore old logger
 // now we can evaluate the result
 Ct.module('CommonJS Basic API');
 
-Ct.test('history', function(t) {
+Ct.test('history', function(t, done) {
   dummy.expect(t, [
     undefined,
     {
@@ -93,6 +93,7 @@ Ct.test('history', function(t) {
     null
   ]);
   dummy.reset();
+  done();
 });
 
 Ct.run();

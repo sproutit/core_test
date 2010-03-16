@@ -25,16 +25,19 @@ dummy = new Ct.DummyLogger('dummy');
 dummy.redirect(); // redirect logging
 
 Ct.module('Basic API');
-Ct.setup(function(t) {
+Ct.setup(function(t, done) {
   t.info('setup');
+  done();
 });
 
-Ct.teardown(function(t) {
+Ct.teardown(function(t, done) {
   t.info('teardown');
+  done();
 });
 
-Ct.test('test1', function(t) {
+Ct.test('test1', function(t, done) {
   t.ok(true, 'Ct.ok(true)');
+  done();
 });
 
 Ct.run();
@@ -47,7 +50,7 @@ dummy.restore(); // restore old logger
 // now we can evaluate the result
 Ct.module('CoreTest Basic API');
 
-Ct.test('history', function(t) {
+Ct.test('history', function(t, done) {
   dummy.expect(t, [
     null, // skip begin 
     
@@ -73,6 +76,7 @@ Ct.test('history', function(t) {
     null   
   ]);
   dummy.reset();
+  done();
 });
 
 Ct.run();
@@ -89,17 +93,14 @@ function now() {
 
 // try this with setup, teardown, and test
 function _delay(msg) {
-  return function(t) {
-    var pr = utils.Promise.create(),
-        cur = now(), later;
+  return function(t, done) {
+    var cur = now(), later;
     
     setTimeout(function() {
       later = now();
       t.ok((later-cur) >= 100, msg);
-      pr.resolve(); // should continue testing
+      done();
     }, 200);
-    
-    return pr; // make async
   };
 }
 
@@ -118,7 +119,7 @@ dummy.restore();
 
 Ct.module('Verify Async API');
 
-Ct.test('history', function(t) {
+Ct.test('history', function(t, done) {
   dummy.expect(t, [
     null, // skip begin 
     
@@ -146,6 +147,7 @@ Ct.test('history', function(t) {
     null   
   ]);
   dummy.reset();
+  done();
 });
 
 Ct.run();

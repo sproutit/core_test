@@ -10,12 +10,14 @@ var Ct = require('core'),
         
 Ct.module('core_test:utils.fmt');
 
-Ct.test("should interpolate % @", function(t) {
+Ct.test("should interpolate % @", function(t, done) {
   t.equal(ut.fmt('%@ is %@', 'foo', 'bar'), 'foo is bar', 'interpolate %@ is %@');
+  done();
 });
 
-Ct.test('should interpolate positional items', function(t) {
+Ct.test('should interpolate positional items', function(t, done) {
   t.equal(ut.fmt('%@2 is %@1', 'foo', 'bar'), 'bar is foo', 'should interpolate %@# as positional');
+  done();
 });
 
 Ct.run();
