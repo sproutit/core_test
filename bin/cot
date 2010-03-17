@@ -32,6 +32,14 @@ var MAP = {
 };
 
 paths = paths.filter(function(p) {
+  if (p === '--version') {
+    // important: don't load core_test unless its needed until after we 
+    // process any args.  Otherwise they might not be picked up
+    var Ct = require('core_test');
+    SYS.puts("cot v"+Ct.VERSION+"\nFlexible testing library");
+    process.exit(0);
+  }
+  
   var opt = MAP[p]
   if (opt) {
     process.env[opt[0]] = opt[1];
@@ -47,7 +55,7 @@ paths = paths.map(function(path) {
 
 // finds the nearest package in the named path, returning the package instance
 function nearestPackage(path, done) {
-  
+    
   function checkPath(path) {
     if (path === '.') return done(null, null); // not found
     
@@ -144,14 +152,14 @@ UTILS.each(paths, function(path, done) {
         }
         
         roots = roots.map(function(dirname) { 
-          return PATH.join(pkg.path, dirname);
+          return PATH.join(pkg.path, dirname,'');
         });
         
         paths = paths.map(function(path) {
           for(var idx=0;idx<roots.length;idx++) {
-            var root = roots[idx];
+            var root = roots[idx] ;
             if (path.indexOf(root)===0) {
-              path = path.slice(root.length+2, 0-PATH.extname(path).length);
+              path = path.slice(root.length, 0-PATH.extname(path).length);
               return '~test/'+path;
             }
           }
@@ -160,6 +168,7 @@ UTILS.each(paths, function(path, done) {
 
         var seen = {};
         paths.forEach(function(moduleId) {
+          if (!moduleId) return; // skip empty
           if (seen[moduleId]) return; // don't do it twice
           seen[moduleId] = true;
           SEED.require(moduleId, null, pkg);
@@ -172,7 +181,8 @@ UTILS.each(paths, function(path, done) {
   });
   
 })(function(err) {
-  SYS.puts(''); // one newline
+
+  SYS.puts('\n');
   if (err) SYS.puts('ERROR: '+err);
 });
   
