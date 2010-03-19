@@ -146,7 +146,7 @@ UTILS.each(paths, function(path, done) {
       // inside of a package get the list of test directories and filter
       // glob based on that
       } else {
-        var roots = pkg.info('test');
+        var roots = pkg.dirnames('test');
         if (!roots) {
           return done("Package "+pkg.name()+"-"+pkg.version()+" does not define any test directories");
         }
