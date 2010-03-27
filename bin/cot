@@ -108,18 +108,17 @@ function glob(path, done) {
 var EXPECTS = ['test', 'spec'];
 function filterGlob(paths) {
   if (!paths) return [];
-  else return paths; 
-  
-  // no filtering for now..
-  
-  // return paths.filter(function(path) {
-  //   var ext = PATH.extname(path),
-  //       filename = PATH.basename(path), idx;
-  //   if (ext && ext.length>0) filename = filename.slice(0, 0-ext.length);
-  //   idx = filename.lastIndexOf('_');
-  //   if (idx<0) return false;
-  //   return EXPECTS.indexOf(filename.slice(idx+1).toLowerCase())>=0;
-  // });
+  if (paths.length===1) return paths; // never filter individual files
+
+  // TODO: Use a config in the pkg for this
+  return paths.filter(function(path) {
+    var ext = PATH.extname(path),
+        filename = PATH.basename(path), idx;
+    if (ext && ext.length>0) filename = filename.slice(0, 0-ext.length);
+    idx = filename.lastIndexOf('_');
+    if (idx<0) return false;
+    return EXPECTS.indexOf(filename.slice(idx+1).toLowerCase())>=0;
+  });
 }
 
 // now loop through each path and work on it...
@@ -139,7 +138,7 @@ UTILS.each(paths, function(path, done) {
       if (err) return done(err); 
       
       // if we're not in a package, just require each path.  It's the scripts
-      // problem if it doesn't have the write context
+      // problem if it doesn't have the right context
       if (!pkg) {
         paths.forEach(function(path) { require(path); });
         
