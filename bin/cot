@@ -7,7 +7,7 @@ require.seed.register(__dirname, '..');
 
 var SYS   = require('default:sys'),
     PATH  = require('default:path'),
-    FS  = require('default:fs'),
+    FS    = require('default:fs'),
     UTILS = require('core_test:utils'),
     SEED  = require.seed;
 
@@ -180,8 +180,15 @@ UTILS.each(paths, function(path, done) {
   });
   
 })(function(err) {
-
-  SYS.puts('\n');
+  
+  // don't put before options processing since the logger is created here
+  var Ct = require('core_test'); 
+  Ct.then(this, function() {
+    var summary = Ct.defaultLogger.summary();
+    SYS.puts('\n\n'+summary);
+    SYS.puts('\n');
+  });
+  
   if (err) SYS.puts('ERROR: '+err);
 });
   
