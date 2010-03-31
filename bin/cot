@@ -28,7 +28,7 @@ var MAP = {
   '--no-color': ['COLOR', false],
   '-v': ['VERBOSE', true],
   '-c': ['COLOR', true],
-  '-q': ['VERBOSE', false]
+  '-q': ['QUIET', true]
 };
 
 paths = paths.filter(function(p) {
