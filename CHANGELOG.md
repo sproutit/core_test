@@ -1,3 +1,6 @@
+## 0.3.0
+
+*	tweaks required to be compatible with tiki/seed.
 
 ## 0.2.3
 
