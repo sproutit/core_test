@@ -1,5 +1,10 @@
 {
   "name": "core_test",
   "description": "Flexible testing library for JavaScript.",
-  "version": "0.3.0"
+  "version": "0.3.0",
+  
+  "dependencies": {
+    "seed": "0.3.0",
+    "tiki": "0.9.0"
+  }
 }

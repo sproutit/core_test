@@ -1,15 +1,14 @@
-#!/usr/bin/env seed-node
+#!/usr/bin/env seed
 
 /*globals process __filename __dirname */
 
 // Make CoreTest the default package
-require.seed.register(__dirname, '..');
+require.loader.register(__dirname, '..');
 
 var SYS   = require('default:sys'),
     PATH  = require('default:path'),
     FS    = require('default:fs'),
-    UTILS = require('core_test:utils'),
-    SEED  = require.seed;
+    UTILS = require('core_test:utils');
 
 /*
   We start with any paths you pass or the current working directory and walk
@@ -40,7 +39,7 @@ paths = paths.filter(function(p) {
     process.exit(0);
   }
   
-  var opt = MAP[p]
+  var opt = MAP[p];
   if (opt) {
     process.env[opt[0]] = opt[1];
     return false;
@@ -63,11 +62,17 @@ function nearestPackage(path, done) {
     var packageJsonPath = PATH.join(path, 'package.json');
     PATH.exists(packageJsonPath, function(exists) {
       if (!exists) return checkPath(dirname);
-      SEED.openPackage(path, function(err, pkg) {
-        if (err) return done(err);
-        if (!pkg) return checkPath(dirname);
-        else return done(null, pkg);
-      });
+      
+      var err, pkg;
+      try {
+        pkg = require.packageFor(path);
+      } catch(e) {
+        err = e;
+      }
+
+      if (err) return done(err);
+      if (!pkg) return checkPath(dirname);
+      else return done(null, pkg);
     });
   }
   
@@ -145,9 +150,9 @@ UTILS.each(paths, function(path, done) {
       // inside of a package get the list of test directories and filter
       // glob based on that
       } else {
-        var roots = pkg.dirnames('test');
+        var roots = pkg.getDirnames('test');
         if (!roots) {
-          return done("Package "+pkg.name()+"-"+pkg.version()+" does not define any test directories");
+          return done(new Error("Package "+pkg.name()+"-"+pkg.version()+" does not define any test directories"));
         }
         
         roots = roots.map(function(dirname) { 
@@ -166,12 +171,25 @@ UTILS.each(paths, function(path, done) {
         });
 
         var seen = {};
-        paths.forEach(function(moduleId) {
-          if (!moduleId) return; // skip empty
-          if (seen[moduleId]) return; // don't do it twice
+        var idx, len = paths.length;
+        for(idx=0;idx<len;idx++) {
+
+          var moduleId = paths[idx];
+          if (!moduleId || seen[moduleId]) continue; // skip empty
           seen[moduleId] = true;
-          SEED.require(moduleId, null, pkg);
-        });
+          
+          err = null;
+          try {
+            require.sandbox.require(moduleId, null, pkg);
+          } catch(e) {
+            err = e;
+          }
+          
+          if (err) {
+            if ('string' === typeof err) err = new Error(err);
+            return done(err);
+          }
+        }
         
       }
       
@@ -188,6 +206,8 @@ UTILS.each(paths, function(path, done) {
     SYS.puts('\n\n'+summary);
     SYS.puts('\n');
   });
+
+  Ct.run();
   
   if (err) SYS.puts('ERROR: '+err);
 });
