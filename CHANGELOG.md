@@ -1,3 +1,7 @@
+## 0.3.1
+
+*	changed named to core-test
+
 ## 0.3.0
 
 *	tweaks required to be compatible with tiki/seed.
@@ -9,7 +13,7 @@
 	
 ## 0.2.0
 
-* Added core_test:sync API
+* Added core-test:sync API
 
 ## 0.1.0 
 

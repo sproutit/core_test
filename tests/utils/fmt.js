@@ -8,7 +8,7 @@
 var Ct = require('core'),
     ut = require('utils');
         
-Ct.module('core_test:utils.fmt');
+Ct.module('core-test:utils.fmt');
 
 Ct.test("should interpolate % @", function(t, done) {
   t.equal(ut.fmt('%@ is %@', 'foo', 'bar'), 'foo is bar', 'interpolate %@ is %@');

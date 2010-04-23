@@ -3,7 +3,7 @@
 # Copyright: ©2009 Apple Inc.
 # ===========================================================================
 
-config :core_test, 
+config :core-test, 
   :required       => [:tiki],
   :debug_required => [],
   :test_required  => [],

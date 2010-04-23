@@ -25,7 +25,7 @@ CoreTest is part of the SproutCore project.
 
 SproutCore and the SproutCore logo are trademarks of Sprout Systems, Inc.
 
-For more information visit http://www.sproutcore.com/core_test
+For more information visit http://www.sproutcore.com/core-test
 
 ==========================================================================
 @license */

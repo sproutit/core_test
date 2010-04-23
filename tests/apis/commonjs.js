@@ -7,7 +7,7 @@
 /*
   NOTE: This file verifies the native CommonJS API.  It swaps out a dummy 
   logger then uses the native CoreTest API to verify the results on that 
-  logger.  See apis/core_test.js for more info
+  logger.  See apis/core-test.js for more info
 */
 var Ct = require('core'), dummy;
 require('loggers/dummy'); // adds Ct.DummyLogger    

@@ -8,7 +8,7 @@ require.loader.register(__dirname, '..');
 var SYS   = require('default:sys'),
     PATH  = require('default:path'),
     FS    = require('default:fs'),
-    UTILS = require('core_test:utils');
+    UTILS = require('core-test:utils');
 
 /*
   We start with any paths you pass or the current working directory and walk
@@ -32,9 +32,9 @@ var MAP = {
 
 paths = paths.filter(function(p) {
   if (p === '--version') {
-    // important: don't load core_test unless its needed until after we 
+    // important: don't load core-test unless its needed until after we 
     // process any args.  Otherwise they might not be picked up
-    var Ct = require('core_test');
+    var Ct = require('core-test');
     SYS.puts("cot v"+Ct.VERSION+"\nFlexible testing library");
     process.exit(0);
   }
@@ -200,7 +200,7 @@ UTILS.each(paths, function(path, done) {
 })(function(err) {
   
   // don't put before options processing since the logger is created here
-  var Ct = require('core_test'); 
+  var Ct = require('core-test'); 
   Ct.then(this, function() {
     var summary = Ct.defaultLogger.summary();
     SYS.puts('\n\n'+summary);
