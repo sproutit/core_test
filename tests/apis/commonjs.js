@@ -87,7 +87,7 @@ Ct.test('history', function(t, done) {
       test:    'testBar',
       status:  Ct.PASS,
       mode:    'test',
-      message: 'bar should be deep equal (actual = 1,2,3, expected = 1,2,3)'
+      message: 'bar should be deep equal (actual = [\n   1,\n   2,\n   3\n], expected = [\n   1,\n   2,\n   3\n])'
     },
     
     null
