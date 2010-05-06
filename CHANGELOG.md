@@ -1,3 +1,7 @@
+## 0.4.0
+
+* 	Reenable spec API
+
 ## 0.3.1
 
 *	changed named to core-test
