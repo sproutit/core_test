@@ -25,9 +25,12 @@ var MAP = {
   '--color': ['COLOR', true],
   '--quiet': ['VERBOSE', false],
   '--no-color': ['COLOR', false],
+  '--all': ['ALL_FILES', true],
+  '--no-all': ['ALL_FILES', false],
   '-v': ['VERBOSE', true],
   '-c': ['COLOR', true],
-  '-q': ['QUIET', true]
+  '-q': ['QUIET', true],
+  '-a': ["ALL_FILES", true]
 };
 
 paths = paths.filter(function(p) {
@@ -114,6 +117,7 @@ var EXPECTS = ['test', 'spec'];
 function filterGlob(paths) {
   if (!paths) return [];
   if (paths.length===1) return paths; // never filter individual files
+  if (process.env.ALL_FILES) return paths; // don't filter
 
   // TODO: Use a config in the pkg for this
   return paths.filter(function(path) {
