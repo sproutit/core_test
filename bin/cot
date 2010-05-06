@@ -124,7 +124,8 @@ function filterGlob(paths) {
     var ext = PATH.extname(path),
         filename = PATH.basename(path), idx;
     if (ext && ext.length>0) filename = filename.slice(0, 0-ext.length);
-    idx = filename.lastIndexOf('_');
+    idx = filename.lastIndexOf('-');
+    if (idx<0) idx = filename.lastIndexOf('_');
     if (idx<0) return false;
     return EXPECTS.indexOf(filename.slice(idx+1).toLowerCase())>=0;
   });
