@@ -89,33 +89,31 @@ describe("module with setup and teardown", function() {
   });
 });
 
-// describe("async module", function() {
-//   
-//   it("should wait until the async test has passed", function(v) {
-//     v.async();
-//     setTimeout(function() {
-//       v(true).should.be(true);
-//       v.expect(1);
-//       v.done();
-//     });
-//   });
-// });
-// 
-// describe("this context", function() {
-//   before(function(v) {
-//     this.foo = 'foo';
-//   });
-//   
-//   after(function(v) {
-//     v(this.foo).should.be('foo');
-//   });
-//   
-//   it("should keep 'this' the same for before, after and test", function(v) {
-//     v(this.foo).should.be('foo');
-//   });
-// });
+describe("async module", function() {
+  
+  it("should wait until the async test has passed", function(v) {
+    v.async();
+    setTimeout(function() {
+      v(true).should.be(true);
+      v.expect(1);
+      v.done();
+    });
+  });
+});
 
-
+describe("this context", function() {
+  before(function(v) {
+    this.foo = 'foo';
+  });
+  
+  after(function(v) {
+    v(this.foo).should.be('foo');
+  });
+  
+  it("should keep 'this' the same for before, after and test", function(v) {
+    v(this.foo).should.be('foo');
+  });
+});
 
 dummy.restore(); // restore old logger
 
@@ -125,7 +123,6 @@ dummy.restore(); // restore old logger
 Ct.module('CommonJS Basic API');
 
 Ct.test('history', function(t) {
-  require('sys').debug(require('sys').inspect(dummy.history));
   dummy.expect(t, [undefined,   
     
     // module without setup/teardown (default)
@@ -234,7 +231,15 @@ Ct.test('history', function(t) {
       test:    'should run setup and teardown',
       mode:    Ct.TEARDOWN_MODE,
       status:  Ct.PASS,
-      message: "expected assertions should be equal (actual = 2, expected = 2)"
+      message: " should be equal (actual = true, expected = true)"
+    },
+
+    {
+      modules: ['module with setup and teardown'],
+      test:    'should run setup and teardown',
+      mode:    Ct.TEARDOWN_MODE,
+      status:  Ct.PASS,
+      message: "expected assertions should be equal (actual = 3, expected = 3)"
     },
 
     // nested setup and teardown
@@ -268,7 +273,67 @@ Ct.test('history', function(t) {
       test:    'should run nested setup and teardowns also',
       mode:    Ct.TEARDOWN_MODE,
       status:  Ct.PASS,
-      message: "expected assertions should be equal (actual = 3, expected = 3)"
+      message: " should be equal (actual = true, expected = true)"
+    },
+
+    {
+      modules: ['module with setup and teardown', 'nested setup and teardown'],
+      test:    'should run nested setup and teardowns also',
+      mode:    Ct.TEARDOWN_MODE,
+      status:  Ct.PASS,
+      message: " should be equal (actual = true, expected = true)"
+    },
+
+    {
+      modules: ['module with setup and teardown', 'nested setup and teardown'],
+      test:    'should run nested setup and teardowns also',
+      mode:    Ct.TEARDOWN_MODE,
+      status:  Ct.PASS,
+      message: "expected assertions should be equal (actual = 5, expected = 5)"
+    },
+    
+    undefined,
+    
+    // async module
+
+    undefined, 
+
+    {
+      modules: ['async module'],
+      test:    'should wait until the async test has passed',
+      mode:    Ct.TEST_MODE,
+      status:  Ct.PASS,
+      message: " should be equal (actual = true, expected = true)"
+    },
+
+    {
+      modules: ['async module'],
+      test:    'should wait until the async test has passed',
+      mode:    Ct.TEARDOWN_MODE,
+      status:  Ct.PASS,
+      message: "expected assertions should be equal (actual = 1, expected = 1)"
+    },
+
+    undefined,
+    
+    // this context
+
+    undefined, 
+
+    {
+      modules: ['this context'],
+      test:    'should keep \'this\' the same for before, after and test',
+      mode:    Ct.TEST_MODE,
+      status:  Ct.PASS,
+      message: " should be equal (actual = foo, expected = foo)"
+    },
+
+    {
+      modules: ['this context'],
+      test:    'should keep \'this\' the same for before, after and test',
+      mode:    Ct.TEARDOWN_MODE,
+      status:  Ct.PASS,
+      message: " should be equal (actual = foo, expected = foo)"
     },
     
     null
